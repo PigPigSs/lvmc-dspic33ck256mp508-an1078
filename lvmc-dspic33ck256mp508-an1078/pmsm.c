@@ -166,22 +166,27 @@ int main ( void )
 
         /* Reset parameters used for running motor through Inverter A */
         ResetParmeters();
-        
+        // break;
         while(1)
         {
             DiagnosticsStepMain();
             BoardService();
+            /*按钮1按下时：
+              若电机正在运行（uGF.bits.RunMotor == 1），调用ResetParmeters()复位参数，并设置uGF.bits.RunMotor = 0。
+              此时内层循环仍会继续执行，但电机已停止，LED2关闭，等待下一次启动命令。
+              ?按钮1再次按下时：
+              若电机未运行（uGF.bits.RunMotor == 0），调用EnablePWMOutputs()使能PWM，并设置uGF.bits.RunMotor = 1，重新启动电机。*/
             if (IsPressed_Button1())
             {
                 if (uGF.bits.RunMotor == 1)
                 {
                     ResetParmeters();
-					trans_counter = 0;
+					          trans_counter = 0;
                     LED2 = 0;
                 }
                 else
                 {
-					EnablePWMOutputs();
+					          EnablePWMOutputs();
                     uGF.bits.RunMotor = 1;
                     LED2 = 1;
                 }
@@ -229,7 +234,7 @@ void ResetParmeters(void)
 {
     /* Make sure ADC does not generate interrupt while initializing parameters*/
 	DisableADCInterrupt();
-    
+// 单电阻采样模式配置 PWM_TRIGA/B/C：配置ADC采样时刻    
 #ifdef SINGLE_SHUNT
     /* Initialize Single Shunt Related parameters */
     SingleShunt_InitializeParameters(&singleShuntParam);
@@ -269,7 +274,7 @@ void ResetParmeters(void)
     MCAPP_MeasureCurrentInit(&measureInputs);
     MCAPP_MeasureAvgInit(&measureInputs.MOSFETTemperature,
             MOSFET_TEMP_AVG_FILTER_SCALE);
-
+    // 恢复ADC中断  
     /* Enable ADC interrupt and begin main loop timing */
     ClearADCIF();
 	adcDataBuffer = ClearADCIF_ReadADCBUF();

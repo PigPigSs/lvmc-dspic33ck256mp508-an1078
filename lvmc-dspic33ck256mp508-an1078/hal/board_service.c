@@ -302,3 +302,4 @@ void pwmDutyCycleLimitCheck (MC_DUTYCYCLEOUT_T *pPwmDutycycle,uint16_t min,uint1
         pPwmDutycycle->dutycycle3 = max;
     }
 }
+//break;return;uGF.bits.RunMotor;
